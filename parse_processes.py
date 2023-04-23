@@ -14,8 +14,8 @@ def parse_processes():
     agg_res = {}
     total_used_memory = 0
     total_used_cpu = 0
-    max_memory = 0
-    max_cpu = 0
+    max_memory = -1
+    max_cpu = -1
     max_memory_process = ''
     max_cpu_process = ''
 
@@ -36,15 +36,15 @@ def parse_processes():
             max_cpu_process = p_command
 
     filename = datetime.now().strftime("%d-%m-%Y-%H:%M-scan.txt")
-    with open(filename, "a") as f:
+    with open(filename, "w") as f:
         f.write('Отчёт о состоянии системы: \n')
         f.write(f'Пользователи системы:  {", ".join(agg_res.keys())}\n')
         f.write(f'Процессов запущено: {sum(agg_res.values())}\n')
         f.write('Пользовательских процессов:\n')
         for key, value in agg_res.items():
             f.write(f'    {key}: {value}\n')
-        f.write(f'Всего памяти используется: {total_used_memory}%\n')
-        f.write(f'Всего CPU используется: {total_used_cpu}%\n')
+        f.write(f'Всего памяти используется: {round(total_used_memory, 1)}%\n')
+        f.write(f'Всего CPU используется: {round(total_used_cpu, 1)}%\n')
         f.write(f'Больше всего памяти использует: {max_memory}% - {max_memory_process}\n' )
         f.write(f'Больше всего CPU использует: {max_cpu}% - {max_cpu_process}\n' )
 
