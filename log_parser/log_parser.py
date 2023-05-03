@@ -62,9 +62,10 @@ if __name__ == '__main__':
     if isfile(args.target):
         log_files.append(args.target)
     else:
-        log_files = [f for f in listdir(args.target) if isfile(join(args.target, f))]
+        log_files = [join(args.target, f) for f in listdir(args.target) if isfile(join(args.target, f))]
     for file in log_files:
-        res_json = parse_log_file(file)
+        res_json = json.dumps(parse_log_file(file), indent=4)
+        print(res_json)
         out_filename = file + '.json'
         with open(out_filename, "w") as f:
-            f.write(json.dumps(res_json, indent=4))
+            f.write(res_json)
