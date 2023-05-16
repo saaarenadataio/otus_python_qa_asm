@@ -19,7 +19,6 @@ def http_response(data, address):
                 if str(sts.value) == status:
                     res_status = status + ' ' + status.phrase
                     break
-
     response = data.split('\r\n')
     request_method = response[0].split()[0]
     response = [f'Request method: {request_method}', f'Request source: {str(address)}', f'Response status: {res_status}'] + response[2:-2]
