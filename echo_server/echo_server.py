@@ -10,6 +10,13 @@ import re
 HOST = 'localhost'
 PORT = 8099
 end_of_stream = '\r\n\r\n'
+http_response_hdr = (
+    f"HTTP/1.1 200 OK\r\n"
+    f"Server: python_daemon\r\n"
+    f"Date: Wed, 26 Dec 1979 19:24:00 MSK\r\n"
+    f"Content-Type: text/plain\r\n"
+)
+
 def http_response(data, address):
     res_status = '200 OK'
     if '?status=' in data:
@@ -17,11 +24,13 @@ def http_response(data, address):
         if status:
             for sts in http.HTTPStatus:
                 if str(sts.value) == status:
-                    res_status = status + ' ' + status.phrase
+                    res_status = status + ' ' + sts.phrase
                     break
     response = data.split('\r\n')
     request_method = response[0].split()[0]
-    response = [f'Request method: {request_method}', f'Request source: {str(address)}', f'Response status: {res_status}'] + response[2:-2]
+#    print(f'met {request_method}', f'st {res_status}', f'dt {data}', f'ad {address}')
+    response = [http_response_hdr, f'Request method: {request_method}', f'Request source: {str(address)}', f'Response status: {res_status}'] + response[2:-2]
+    print(f"res {response}")
     return response
 
 def handle_client(connection, address):
@@ -36,7 +45,7 @@ def handle_client(connection, address):
             if end_of_stream in client_data:
                 break
         #send response to client
-        connection.send('\r\n'.join(http_response(client_data, address)).encode() + f'\r\n'.encode())
+        connection.send(('\r\n'.join(http_response(client_data, address))).encode() + f'\r\n'.encode())
 
 def server_process():
     with socket.socket() as ss:
