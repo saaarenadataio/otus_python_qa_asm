@@ -41,7 +41,7 @@ single_brewery_schema = {
 
 
 @pytest.mark.parametrize(
-    "filters", ["Austin", "United States"], ids=["city", "country"]
+    "filters", [brewery_city(), brewery_country()], ids=["city", "country"]
 )
 def test_brewery_search(filters):
     query = {"query": filters, "per_page": "10"}

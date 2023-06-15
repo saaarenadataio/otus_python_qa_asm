@@ -10,7 +10,6 @@ def random_breed():
     return random.choice(list_breeds)
 
 
-@pytest.fixture
 def brewery_city():
     r = requests.get("https://api.openbrewerydb.org/breweries").json()
     cities = []
@@ -19,7 +18,6 @@ def brewery_city():
     return random.choice(cities)
 
 
-@pytest.fixture
 def brewery_country():
     r = requests.get("https://api.openbrewerydb.org/breweries").json()
     countries = []
