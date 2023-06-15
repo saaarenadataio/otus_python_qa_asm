@@ -41,7 +41,7 @@ single_brewery_schema = {
 
 
 @pytest.mark.parametrize(
-    "filters", [brewery_city, brewery_country], ids=["city", "country"]
+    "filters", ["Austin", "United States"], ids=["city", "country"]
 )
 def test_brewery_search(filters):
     query = {"query": filters, "per_page": "10"}
@@ -50,7 +50,7 @@ def test_brewery_search(filters):
         r.status_code == 200
     ), f"Wrong status code returned: {r.status_code}, expected 200"
     for brewery in r.json():
-        validate(instance=brewery, schema=single_brewery_schema)
+        validate(instance=brewery, schema=single_brewery_schema['properties'])
 
 
 
