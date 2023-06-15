@@ -49,12 +49,15 @@ def test_brewery_search(filters):
     assert (
         r.status_code == 200
     ), f"Wrong status code returned: {r.status_code}, expected 200"
+    for brewery in r.json():
+        validate(instance=brewery, schema=single_brewery_schema)
+
 
 
 @pytest.mark.parametrize(
-    "types", ["micro", "large", "brewpub", "closed", "no_such_type"]
+    "types", ["micro", "large", "brewpub", "closed"]
 )
-def test_breweries_by_type(types):
+def test_breweries_by_type_positive(types):
     schema_breweries_meta = {
         "type": "object",
         "properties": {
@@ -66,15 +69,21 @@ def test_breweries_by_type(types):
     }
     query = {"by_type": types, "per_page": "10"}
     r = requests.get(test_url + breweries_path + meta_path, params=query)
-    if types == "no_such_type":
-        assert (
+    assert (
+        r.status_code == 200
+        ), f"Wrong status code returned: {r.status_code}, expected 200"
+    validate(instance=r.json(), schema=schema_breweries_meta)
+
+@pytest.mark.parametrize(
+    "types", ["no_such_type"]
+)
+def test_breweries_by_type_negative(types):
+    query = {"by_type": types, "per_page": "10"}
+    r = requests.get(test_url + breweries_path + meta_path, params=query)
+    assert (
             r.status_code == 400
         ), f"Wrong status code returned: {r.status_code}, expected 400"
-    else:
-        assert (
-            r.status_code == 200
-        ), f"Wrong status code returned: {r.status_code}, expected 200"
-        validate(instance=r.json(), schema=schema_breweries_meta)
+
 
 
 def test_per_page():

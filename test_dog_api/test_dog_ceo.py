@@ -20,30 +20,21 @@ action_list_all = "/breeds/list/all"
 
 @pytest.mark.parametrize(
     "breed",
-    ["eskimo", "terrier", "birman", "basset"],
-    ids=["no_child_breeds", "with_child_breeds", "no_such_breed", "child_breed"],
+    ["eskimo", "terrier"],
+    ids=["no_child_breeds", "with_child_breeds"],
 )
-def test_sub_breeds(breed):
+def test_sub_breeds_positive(breed):
     r = requests.get(test_url + breed_path + breed + action_list)
     schema = {
         "type": "object",
         "properties": {"message": {"type": "array"}, "status": {"type": "string"}},
         "required": ["message", "status"],
     }
-    if breed in ["birman", "basset"]:
-        assert r.status_code == 404, f"Wrong status code {r.status_code}, expected 404"
-        assert (
-            r.json()["status"] == "error"
-        ), f'Wrong status {r.json()["status"]}, expected "error"'
-        assert (
-            r.json()["message"] == "Breed not found (master breed does not exist)"
-        ), f'Wrong error message {r.json()["message"]}'
-    else:
-        assert r.status_code == 200, f"Wrong status code {r.status_code}, expected 200"
-        assert (
+    assert r.status_code == 200, f"Wrong status code {r.status_code}, expected 200"
+    assert (
             r.json()["status"] == "success"
         ), f'Wrong status {r.json()["status"]}, expected "success"'
-        validate(instance=r.json(), schema=schema)
+    validate(instance=r.json(), schema=schema)
 
 
 def test_random_image():
@@ -65,30 +56,54 @@ def test_random_image():
 
 @pytest.mark.parametrize(
     "breed",
-    ["eskimo", "terrier", "birman", "basset"],
-    ids=["no_child_breeds", "with_child_breeds", "no_such_breed", "child_breed"],
+    ["birman", "basset"],
+    ids=["no_such_breed", "child_breed"],
 )
-def test_breed_images(breed):
+def test_sub_breeds_negative(breed):
+    r = requests.get(test_url + breed_path + breed + action_list)
+    assert r.status_code == 404, f"Wrong status code {r.status_code}, expected 404"
+    assert (
+            r.json()["status"] == "error"
+        ), f'Wrong status {r.json()["status"]}, expected "error"'
+    assert (
+            r.json()["message"] == "Breed not found (master breed does not exist)"
+        ), f'Wrong error message {r.json()["message"]}'
+
+
+@pytest.mark.parametrize(
+    "breed",
+    ["eskimo", "terrier"],
+    ids=["no_child_breeds", "with_child_breeds"],
+)
+def test_breed_images_positive(breed):
     r = requests.get(test_url + breed_path + breed + action_images)
     schema = {
         "type": "object",
         "properties": {"message": {"type": "array"}, "status": {"type": "string"}},
         "required": ["message", "status"],
     }
-    if breed in ["birman", "basset"]:
-        assert r.status_code == 404, f"Wrong status code {r.status_code}, expected 404"
-        assert (
-            r.json()["status"] == "error"
-        ), f'Wrong status {r.json()["status"]}, expected "error"'
-        assert (
-            r.json()["message"] == "Breed not found (master breed does not exist)"
-        ), f'Wrong error message {r.json()["message"]}'
-    else:
-        assert r.status_code == 200, f"Wrong status code {r.status_code}, expected 200"
-        assert (
+    assert r.status_code == 200, f"Wrong status code {r.status_code}, expected 200"
+    assert (
             r.json()["status"] == "success"
         ), f'Wrong status {r.json()["status"]}, expected "success"'
-        validate(instance=r.json(), schema=schema)
+    validate(instance=r.json(), schema=schema)
+
+
+@pytest.mark.parametrize(
+    "breed",
+    ["birman", "basset"],
+    ids=["no_such_breed", "child_breed"],
+)
+def test_breed_images_negative(breed):
+    r = requests.get(test_url + breed_path + breed + action_images)
+    assert r.status_code == 404, f"Wrong status code {r.status_code}, expected 404"
+    assert (
+            r.json()["status"] == "error"
+        ), f'Wrong status {r.json()["status"]}, expected "error"'
+    assert (
+            r.json()["message"] == "Breed not found (master breed does not exist)"
+        ), f'Wrong error message {r.json()["message"]}'
+
 
 
 def test_full_breeds_list():
